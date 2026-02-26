@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Репостер из Telegram в LinkedIn</title>
+  <meta name="description" content="Автоматический репост из Telegram в LinkedIn за минуту. Один тариф: 20 € / месяц." />
+  <style>
+    :root{
+      --bg0:#050816;
+      --bg1:#070b1f;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.10);
+      --stroke:rgba(120,170,255,.22);
+      --stroke2:rgba(120,170,255,.35);
+      --text:#eaf1ff;
+      --muted:rgba(234,241,255,.78);
+      --muted2:rgba(234,241,255,.62);
+      --blue:#4da3ff;
+      --blue2:#2f6dff;
+      --cyan:#47e6ff;
+      --glow:0 0 22px rgba(77,163,255,.35);
+      --glow2:0 0 42px rgba(71,230,255,.18);
+      --shadow:0 18px 60px rgba(0,0,0,.55);
+      --r:20px;
+      --max:1120px;
+
+      /* масштаб текста */
+      --base: 18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+      font-size:var(--base);
+      background:
+        radial-gradient(900px 500px at 18% 12%, rgba(77,163,255,.18), transparent 60%),
+        radial-gradient(700px 420px at 85% 20%, rgba(71,230,255,.14), transparent 55%),
+        radial-gradient(800px 520px at 50% 90%, rgba(47,109,255,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:30px 18px 70px}
+
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; padding:12px 4px 28px;
+    }
+    .brand{display:flex; align-items:center; gap:14px; user-select:none}
+    .logo{
+      width:44px; height:44px; border-radius:16px;
+      background:linear-gradient(135deg, rgba(77,163,255,.92), rgba(71,230,255,.66));
+      box-shadow:var(--glow), var(--shadow);
+      position:relative; overflow:hidden;
+    }
+    .logo:before{
+      content:"";
+      position:absolute; inset:-40%;
+      background:conic-gradient(from 180deg, rgba(255,255,255,.0), rgba(255,255,255,.35), rgba(255,255,255,.0));
+      animation:spin 6s linear infinite;
+      filter:blur(2px);
+      opacity:.55;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .brandTitle{
+      display:flex; flex-direction:column; gap:4px;
+      line-height:1.15;
+    }
+    .brandTitle b{font-size:16px; letter-spacing:.2px}
+    .brandTitle span{font-size:14px; color:var(--muted2)}
+
+    .pill{
+      font-size:14px; color:var(--muted);
+      padding:10px 14px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.03);
+      border-radius:999px;
+      backdrop-filter: blur(10px);
+      white-space:nowrap;
+    }
+
+    .hero{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    @media (max-width: 920px){
+      .hero{grid-template-columns:1fr}
+    }
+
+    .card{
+      border-radius:var(--r);
+      background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.04));
+      border:1px solid var(--stroke);
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .card:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(800px 260px at 18% 0%, rgba(77,163,255,.22), transparent 58%),
+        radial-gradient(560px 260px at 98% 10%, rgba(71,230,255,.16), transparent 58%);
+      pointer-events:none;
+      opacity:.95;
+    }
+    .card > *{position:relative}
+
+    .heroMain{padding:34px 30px}
+    h1{
+      margin:0 0 12px;
+      font-size:44px;
+      line-height:1.08;
+      letter-spacing:.2px;
+    }
+    @media (max-width:520px){
+      h1{font-size:34px}
+    }
+
+    .sub{
+      margin:0 0 18px;
+      color:var(--muted);
+      font-size:20px;
+      line-height:1.65;
+      max-width:62ch;
+    }
+
+    .valueRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:12px;
+      margin:18px 0 20px;
+    }
+    @media (max-width: 820px){
+      .valueRow{grid-template-columns:1fr}
+    }
+    .value{
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(120,170,255,.20);
+      background:rgba(0,0,0,.14);
+      backdrop-filter: blur(10px);
+    }
+    .value b{
+      display:block;
+      font-size:16px;
+      margin-bottom:6px;
+    }
+    .value span{
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.55;
+    }
+
+    .flow{
+      display:flex; flex-wrap:wrap; gap:12px;
+      margin:10px 0 22px;
+    }
+    .step{
+      flex:1 1 190px;
+      min-width:190px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.14);
+      backdrop-filter: blur(10px);
+    }
+    .step small{
+      display:inline-flex; align-items:center; gap:9px;
+      color:var(--muted2);
+      font-size:14px;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:11px; height:11px; border-radius:50%;
+      background:linear-gradient(135deg, var(--blue), var(--cyan));
+      box-shadow:var(--glow2);
+    }
+    .step b{
+      display:block;
+      margin-top:8px;
+      font-size:16px;
+      line-height:1.35;
+    }
+
+    .ctaRow{
+      display:flex; flex-wrap:wrap; gap:14px; align-items:center;
+      margin-top:18px;
+    }
+    .btn{
+      appearance:none; border:none; cursor:pointer;
+      padding:16px 18px;
+      border-radius:16px;
+      background:linear-gradient(135deg, rgba(77,163,255,.98), rgba(47,109,255,.94));
+      color:#081024;
+      font-weight:900;
+      font-size:16px;
+      letter-spacing:.2px;
+      box-shadow:var(--glow), 0 18px 54px rgba(47,109,255,.22);
+      transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .btn:hover{transform: translateY(-1px); filter:saturate(1.06)}
+    .btn:active{transform: translateY(0px); filter:saturate(.98)}
+    .btn:focus{outline:2px solid rgba(71,230,255,.55); outline-offset:3px}
+    .btn svg{width:18px; height:18px}
+
+    .note{
+      color:var(--muted2);
+      font-size:16px;
+      line-height:1.55;
+      margin:0;
+      max-width:62ch;
+    }
+
+    .heroSide{padding:24px}
+    .price{
+      border-radius:18px;
+      padding:20px 18px;
+      border:1px solid var(--stroke2);
+      background:rgba(0,0,0,.16);
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      color:rgba(8,16,36,.92);
+      background:linear-gradient(135deg, rgba(71,230,255,.88), rgba(77,163,255,.78));
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:900;
+      box-shadow:var(--glow2);
+    }
+    .price h2{
+      margin:12px 0 8px;
+      font-size:18px;
+      letter-spacing:.2px;
+    }
+    .money{
+      margin:12px 0 8px;
+      font-size:44px;
+      font-weight:950;
+      letter-spacing:.2px;
+      line-height:1.05;
+    }
+    .money span{font-size:16px; font-weight:800; color:var(--muted)}
+    .ul{
+      margin:16px 0 0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:12px;
+    }
+    .ul li{
+      display:flex; gap:10px; align-items:flex-start;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.5;
+    }
+    .check{
+      width:20px; height:20px; border-radius:8px;
+      background:rgba(77,163,255,.18);
+      border:1px solid var(--stroke2);
+      box-shadow:var(--glow2);
+      flex:0 0 auto;
+      margin-top:1px;
+      position:relative;
+    }
+    .check:after{
+      content:"";
+      position:absolute;
+      left:6px; top:4px;
+      width:6px; height:9px;
+      border-right:2px solid rgba(234,241,255,.92);
+      border-bottom:2px solid rgba(234,241,255,.92);
+      transform:rotate(45deg);
+      opacity:.95;
+    }
+
+    .section{padding:22px 20px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      margin-top:16px;
+    }
+    @media (max-width: 820px){
+      .grid{grid-template-columns:1fr}
+    }
+    .section h3{margin:0 0 10px; font-size:18px}
+    .section p{margin:0; color:var(--muted); line-height:1.7; font-size:16px}
+
+    .bullets{
+      margin:10px 0 0;
+      padding-left:18px;
+      color:var(--muted);
+      line-height:1.7;
+      font-size:16px;
+    }
+
+    .rules{
+      margin-top:12px;
+      display:grid;
+      gap:12px;
+    }
+    .rule{
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.12);
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.6;
+    }
+
+    .faq{
+      margin-top:14px;
+      display:grid;
+      gap:12px;
+    }
+    details{
+      border:1px solid var(--stroke);
+      background:rgba(0,0,0,.12);
+      border-radius:16px;
+      overflow:hidden;
+    }
+    summary{
+      cursor:pointer;
+      padding:14px 14px;
+      list-style:none;
+      user-select:none;
+      color:var(--text);
+      font-weight:900;
+      font-size:16px;
+    }
+    details[open] summary{
+      border-bottom:1px solid rgba(120,170,255,.18);
+      background:rgba(255,255,255,.03);
+    }
+    details p{
+      margin:0;
+      padding:14px 14px 16px;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.7;
+    }
+    summary::-webkit-details-marker{display:none}
+
+    .trustRow{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 820px){
+      .trustRow{grid-template-columns:1fr}
+    }
+    .trust{
+      padding:14px 14px;
+      border-radius:16px;
+      border:1px solid rgba(120,170,255,.18);
+      background:rgba(0,0,0,.10);
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.55;
+    }
+    .trust b{color:var(--text)}
+
+    footer{
+      margin-top:20px;
+      padding:18px 6px 0;
+      color:rgba(234,241,255,.45);
+      font-size:13px;
+      line-height:1.6;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="brandTitle">
+          <b>Telegram → LinkedIn Репостер</b>
+          <span>Регулярный LinkedIn без ручной рутины</span>
+        </div>
+      </div>
+      <div class="pill">Один тариф: 20 € / месяц</div>
+    </div>
+
+    <section class="hero">
+      <div class="card heroMain">
+        <h1>LinkedIn будет жить регулярно, даже если у вас нет времени</h1>
+        <p class="sub">
+          Публикуйте пост в Telegram-канале: через минуту он автоматически появляется в LinkedIn.
+          Вы сохраняете привычный рабочий процесс, а контент начинает работать на вашу видимость и доверие.
+        </p>
+
+        <div class="valueRow" aria-label="Ключевые преимущества">
+          <div class="value">
+            <b>Стабильность</b>
+            <span>Регулярные публикации без «срывов», даже в загруженные недели.</span>
+          </div>
+          <div class="value">
+            <b>Экономия времени</b>
+            <span>Один пост: два канала. Никакого копи-паста и перепроверок.</span>
+          </div>
+          <div class="value">
+            <b>Можно на другом языке</b>
+            <span>Опционально: перевод и адаптация текста под аудиторию.</span>
+          </div>
+        </div>
+
+        <div class="flow" aria-label="Как это работает">
+          <div class="step">
+            <small><span class="dot"></span>Шаг 1</small>
+            <b>Публикуете пост в Telegram</b>
+          </div>
+          <div class="step">
+            <small><span class="dot"></span>Шаг 2</small>
+            <b>Сервис корректно переносит и форматирует</b>
+          </div>
+          <div class="step">
+            <small><span class="dot"></span>Шаг 3</small>
+            <b>Пост появляется в LinkedIn автоматически</b>
+          </div>
+        </div>
+
+        <div class="ctaRow">
+          <a class="btn"
+             href="https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_0zdU9D7gzfYC8sGdXzWmEKJs6MkAlhE5vaFWc3ftjeI/redirect"
+             target="_blank" rel="noopener noreferrer">
+            Оплатить подписку
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M7 17L17 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M10 7h7v7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </a>
+          <p class="note">
+            После оплаты вы получите инструкции и список доступов. Обычно старт занимает 10–15 минут с вашей стороны.
+          </p>
+        </div>
+
+        <div class="trustRow" aria-label="Доверие и снижение рисков">
+          <div class="trust"><b>Без лишних действий.</b> Вы продолжаете писать там, где удобно: в Telegram.</div>
+          <div class="trust"><b>Прозрачно.</b> Понятные правила: 7 дней на возврат и отключение интеграции.</div>
+          <div class="trust"><b>Практично.</b> Сервис закрывает типичную проблему: «понимаю, что надо вести LinkedIn, но некогда».</div>
+        </div>
+      </div>
+
+      <aside class="card heroSide" aria-label="Тариф">
+        <div class="price">
+          <div class="tag">Подписка</div>
+          <h2>Один тариф, без скрытых уровней</h2>
+          <div class="money">20 € <span>/ месяц</span></div>
+
+          <ul class="ul">
+            <li><span class="check"></span><span>Автоматический репост из Telegram в LinkedIn</span></li>
+            <li><span class="check"></span><span>Подключение и базовая настройка</span></li>
+            <li><span class="check"></span><span>Опционально: перевод и адаптация текста под язык публикации</span></li>
+            <li><span class="check"></span><span>Поддержка по вопросам работы интеграции</span></li>
+          </ul>
+
+          <div style="margin-top:18px">
+            <a class="btn"
+               href="https://sandbox-api.polar.sh/v1/checkout-links/polar_cl_0zdU9D7gzfYC8sGdXzWmEKJs6MkAlhE5vaFWc3ftjeI/redirect"
+               target="_blank" rel="noopener noreferrer"
+               style="width:100%; justify-content:center;">
+              Оплатить подписку
+            </a>
+            <p class="note" style="margin-top:12px">
+              Важно: сейчас указана sandbox-ссылка Polar. Для реальных платежей замените ее на production checkout-link.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid">
+      <div class="card section">
+        <h3>Что вы получите на практике</h3>
+        <p>Это не «еще один сервис». Это простой способ удерживать регулярность и не терять импульс в LinkedIn.</p>
+        <ul class="bullets">
+          <li>Ваш LinkedIn становится активным без лишнего напряжения.</li>
+          <li>Контент из Telegram начинает приносить больше охвата и доверия.</li>
+          <li>Вы не переписываете посты вручную и не откладываете публикации.</li>
+        </ul>
+      </div>
+
+      <div class="card section">
+        <h3>Правила, чтобы не было спорных моментов</h3>
+        <div class="rules">
+          <div class="rule">Возврат в течение 7 дней: по любой причине, без лишних вопросов.</div>
+          <div class="rule">После возврата интеграция отключается.</div>
+          <div class="rule">На старте от вас нужно 10–15 минут на доступы и уточнения.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card section" style="margin-top:14px">
+      <h3>FAQ</h3>
+      <div class="faq">
+        <details>
+          <summary>Как быстро это начинает работать?</summary>
+          <p>Обычно подключение занимает 3–4 дня: вы даете доступы и мы согласуем детали формата публикаций.</p>
+        </details>
+        <details>
+          <summary>Можно ли публиковать на другом языке?</summary>
+          <p>Да. Можно настроить перевод и адаптацию текста на английский, испанский и другие языки.</p>
+        </details>
+        <details>
+          <summary>Что нужно от меня для старта?</summary>
+          <p>Доступы и пара уточнений по стилю и формату. Обычно это занимает 10–15 минут.</p>
+        </details>
+        <details>
+          <summary>Почему выносить контент в LinkedIn вообще важно?</summary>
+          <p>Если вы и так пишете в Telegram, перенос в LinkedIn увеличивает шанс, что вас увидят коллеги, клиенты и партнеры. Регулярность решает больше, чем «идеальный пост».</p>
+        </details>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="y"></span> Telegram → LinkedIn Репостер
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
